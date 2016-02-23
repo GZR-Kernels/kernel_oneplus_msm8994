@@ -1247,7 +1247,7 @@ static void gesture_judge(struct synaptics_ts_data *ts)
 }
 #endif
 /***************end****************/
-static char prlog_count = 0;
+// static char prlog_count = 0;
 
 void int_touch(void)
 {
@@ -1319,8 +1319,6 @@ void int_touch(void)
 	if (finger_num == 0)
 	{
 		input_report_key(ts->input_dev,BTN_TOUCH, 0);
-        if (3 == (++prlog_count % 6))
-            TPD_ERR("all finger up\n");
 		input_report_key(ts->input_dev, BTN_TOOL_FINGER, 0);
 #ifndef TYPE_B_PROTOCOL
 		input_mt_sync(ts->input_dev);
