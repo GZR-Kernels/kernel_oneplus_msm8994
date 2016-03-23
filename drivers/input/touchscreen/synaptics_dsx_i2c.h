@@ -294,6 +294,7 @@ struct synaptics_rmi4_data {
 	unsigned char pdoze_enable;  //pdoze mode
 	unsigned char smartcover_enable;  //smartcover mode
 	unsigned char pdoze_status;
+	atomic_t keypad_enable;
 	unsigned char bcontinue;
 	unsigned char bremove;
 	struct workqueue_struct *reportqueue;  //for work queue
