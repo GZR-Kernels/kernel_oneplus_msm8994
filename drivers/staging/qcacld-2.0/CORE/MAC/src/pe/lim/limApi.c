@@ -1657,87 +1657,6 @@ limHandleIBSScoalescing(
     return retCode;
 } /*** end limHandleIBSScoalescing() ***/
 
-/**
- * lim_enc_type_matched() - matches security type of incoming beracon with
- * current
- * @mac_ctx      Pointer to Global MAC structure
- * @bcn          Pointer to parsed Beacon structure
- * @session     PE session entry
- *
- * This function matches security type of incoming beracon with current
- *
- * @return true if matched, false otherwise
- */
-static bool
-lim_enc_type_matched(tpAniSirGlobal mac_ctx,
-                  tpSchBeaconStruct bcn,
-                  tpPESession session)
-{
-    if (!bcn || !session)
-        return false;
-
-    limLog(mac_ctx, LOG1,
-           FL("Beacon/Probe:: Privacy :%d WPA Present:%d RSN Present: %d"),
-           bcn->capabilityInfo.privacy, bcn->wpaPresent,
-           bcn->rsnPresent);
-    limLog(mac_ctx, LOG1,
-           FL("session:: Privacy :%d EncyptionType: %d OSEN %d WPS %d"),
-           SIR_MAC_GET_PRIVACY(session->limCurrentBssCaps),
-           session->encryptType, session->osen_association,
-           session->wps_registration);
-
-    /* This is handled by sending probe req due to IOT issues so return TRUE */
-    if ((bcn->capabilityInfo.privacy) !=
-            SIR_MAC_GET_PRIVACY(session->limCurrentBssCaps)) {
-        limLog(mac_ctx, LOGW, FL("Privacy bit miss match\n"));
-        return true;
-    }
-
-    /* Open */
-    if ((bcn->capabilityInfo.privacy == 0)
-           && (session->encryptType == eSIR_ED_NONE))
-        return true;
-
-    /* WEP */
-    if ((bcn->capabilityInfo.privacy == 1)
-           && (bcn->wpaPresent == 0)
-           && (bcn->rsnPresent == 0)
-           && ((session->encryptType == eSIR_ED_WEP40)
-                  || (session->encryptType == eSIR_ED_WEP104)
-#ifdef FEATURE_WLAN_WAPI
-                  || (session->encryptType == eSIR_ED_WPI)
-#endif
-           ))
-        return true;
-
-    /* WPA OR RSN*/
-    if ((bcn->capabilityInfo.privacy == 1)
-            && ((bcn->wpaPresent == 1) || (bcn->rsnPresent == 1))
-            && ((session->encryptType == eSIR_ED_TKIP)
-                    || (session->encryptType == eSIR_ED_CCMP)
-                    || (session->encryptType == eSIR_ED_AES_128_CMAC)))
-        return true;
-
-    /* For HS2.0, RSN ie is not present
-     * in beacon. Therefore no need to
-     * check for security type in case
-     * OSEN session.
-     * For WPS registration session no need to
-     * detect security mismatch as it won't match and
-     * driver may end up sending probe request without
-     * WPS IE during WPS registration process.
-     */
-     /*TODO: AP capability mismatch
-     * is not checked here because
-     * no logic for beacon parsing
-     * is avilable for HS2.0
-     */
-    if (session->osen_association ||
-            session->wps_registration)
-        return eSIR_TRUE;
-
-    return false;
-}
 
 /**
  * limDetectChangeInApCapabilities()
@@ -1770,12 +1689,10 @@ limDetectChangeInApCapabilities(tpAniSirGlobal pMac,
     tANI_U8                 len;
     tSirSmeApNewCaps   apNewCaps;
     tANI_U8            newChannel;
-    bool security_caps_matched = true;
     tSirRetStatus status = eSIR_SUCCESS;
     apNewCaps.capabilityInfo = limGetU16((tANI_U8 *) &pBeacon->capabilityInfo);
     newChannel = (tANI_U8) pBeacon->channelNumber;
 
-    security_caps_matched = lim_enc_type_matched(pMac, pBeacon, psessionEntry);
     if ( ( false == psessionEntry->limSentCapsChangeNtf ) &&
         ( ( ( !limIsNullSsid(&pBeacon->ssId) ) &&
              ( false == limCmpSSid(pMac, &pBeacon->ssId, psessionEntry) ) ) ||
@@ -1788,8 +1705,7 @@ limDetectChangeInApCapabilities(tpAniSirGlobal pMac,
           ( SIR_MAC_GET_QOS(apNewCaps.capabilityInfo) !=
             SIR_MAC_GET_QOS(psessionEntry->limCurrentBssCaps) ) ||
           ( (newChannel !=  psessionEntry->currentOperChannel) &&
-            (newChannel != 0) ) ||
-          (eSIR_FALSE == security_caps_matched)
+            (newChannel != 0) )
           ) ) )
     {
         if (false == psessionEntry->fWaitForProbeRsp)
