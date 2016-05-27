@@ -36,7 +36,7 @@
 
 #define HOTPLUG_ENABLED              (1)
 #define DEFAULT_HOTPLUG_STYLE         HOTPLUG_SCHED
-#define DEFAULT_SCHED_MODE            BALANCED
+#define DEFAULT_SCHED_MODE            TURBO
 
 #define DEF_SAMPLING_MS	             (500)
 #define MIN_SAMLING_MS               (50)
@@ -511,11 +511,11 @@ static int lcd_notifier_callback(struct notifier_block *nb,
 
 static void set_sched_profile(int mode) {
     switch(mode) {
-	   case 1:
+	   case BALANCED:
 	       /* Balanced */
 	       sched_set_boost(DISABLED);
 	   break;
-	   case 2:
+	   case TURBO:
 	       /* Turbo */
 	       sched_set_boost(ENABLED);
 	   break;
