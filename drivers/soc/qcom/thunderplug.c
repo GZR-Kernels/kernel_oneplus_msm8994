@@ -47,8 +47,8 @@ static bool isSuspended = false;
 
 struct notifier_block lcd_worker;
 
-static int suspend_cpu_num = 2, resume_cpu_num = (NR_CPUS -1);
-static int endurance_level = 0;
+static int suspend_cpu_num = 1, resume_cpu_num = (NR_CPUS -1);
+static int endurance_level = 1;
 static int core_limit = NR_CPUS;
 
 static int now[8], last_time[8];
@@ -107,6 +107,10 @@ static inline void offline_cpus(void)
 			if( NR_CPUS >=4 && suspend_cpu_num > NR_CPUS / 4)
 				suspend_cpu_num = NR_CPUS / 4;
 		break;
+		case 3:
+			if( NR_CPUS >=8 && suspend_cpu_num > NR_CPUS / 8)
+				suspend_cpu_num = NR_CPUS / 8;
+		break;
 		default:
 		break;
 	}
@@ -128,6 +132,10 @@ static inline void cpus_online_all(void)
 	case 2:
 		if( NR_CPUS >= 4 && resume_cpu_num > ((NR_CPUS / 4) - 1))
 			resume_cpu_num = ((NR_CPUS / 4) - 1);
+	break;
+	case 3:
+		if( NR_CPUS >= 8 && resume_cpu_num > ((NR_CPUS / 8) - 1))
+			resume_cpu_num = ((NR_CPUS / 8) - 1);
 	break;
 	case 0:
 			resume_cpu_num = (NR_CPUS - 1);
@@ -284,6 +292,7 @@ static ssize_t __ref thunderplug_endurance_store(struct kobject *kobj, struct ko
 	case 0:
 	case 1:
 	case 2:
+	case 3:
 		if(endurance_level!=val &&
 		   !(endurance_level > 1 && NR_CPUS < 4)) {
 		endurance_level = val;
