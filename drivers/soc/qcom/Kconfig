@@ -656,10 +656,9 @@ config BRICKED_HOTPLUG
 	 This enables kernel based multi core control.
 
 config THUNDERPLUG_CONTROL
-	bool "Enable plugging down/up of cores using powersuspend"
-	help
-	  This driver uses powersuspend to take down the cpu cores
-	  on a octa core device.
+ 	bool "Enable plugging down/up of cores based on load per core"
+ 	help
+ 	  This driver hotplugs cpu cores based on per-core load
 	  
 config STATE_NOTIFIER
         bool "State Notifier"

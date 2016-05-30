@@ -61,10 +61,10 @@ struct cpufreq_policy old_policy[NR_CPUS];
 
 #ifdef CONFIG_SCHED_HMP
 static int tplug_hp_style = DEFAULT_HOTPLUG_STYLE;
+static int tplug_sched_mode = DEFAULT_SCHED_MODE;
 #else
 static int tplug_hp_enabled = HOTPLUG_ENABLED;
 #endif
-static int tplug_sched_mode = DEFAULT_SCHED_MODE;
 static int touch_boost_enabled = TOUCH_BOOST_ENABLED;
 
 static struct workqueue_struct *tplug_wq;
@@ -287,7 +287,11 @@ static ssize_t __ref thunderplug_endurance_store(struct kobject *kobj, struct ko
 {
 	int val;
 	sscanf(buf, "%d", &val);
-	if(tplug_hp_style == 1) {
+#ifdef CONFIG_SCHED_HMP
+	if(tplug_hp_style==1) {
+#else
+	if(tplug_hp_enabled) {
+#endif
 	switch(val) {
 	case 0:
 	case 1:
@@ -303,8 +307,8 @@ static ssize_t __ref thunderplug_endurance_store(struct kobject *kobj, struct ko
 	default:
 		pr_info("%s: invalid endurance level\n", THUNDERPLUG);
 	break;
-	}
-	}
+        }
+    }
 	else
 	   pr_info("%s: per-core hotplug style is disabled, ignoring endurance mode values\n", THUNDERPLUG);
 
