@@ -35,7 +35,7 @@
 
 #define DEFAULT_CPU_LOAD_THRESHOLD	(90)
 
-#define HOTPLUG_ENABLED			(0)
+#define HOTPLUG_ENABLED			(1)
 #define STARTDELAY			1000
 
 #define DEF_SAMPLING_MS			(20)
