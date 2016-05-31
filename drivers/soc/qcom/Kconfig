@@ -654,11 +654,6 @@ config BRICKED_HOTPLUG
 	default y
 	help
 	 This enables kernel based multi core control.
-
-config THUNDERPLUG_CONTROL
- 	bool "Enable plugging down/up of cores based on load per core"
- 	help
- 	  This driver hotplugs cpu cores based on per-core load
 	  
 config STATE_NOTIFIER
         bool "State Notifier"
