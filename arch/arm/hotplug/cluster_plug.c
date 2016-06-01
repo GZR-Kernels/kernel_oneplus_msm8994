@@ -108,7 +108,7 @@ static unsigned int get_num_loaded_big_cpus(void)
 	unsigned int cpu;
 	unsigned int loaded_cpus = 0;
 
-	for_each_online_cpu(cpu) {
+	for_each_possible_cpu(cpu) {
 		if (is_big_cpu(cpu)) {
 			unsigned int cpu_load = get_delta_cpu_load_and_update(cpu);
 			/* If a cpu is offline, assume it was loaded and forced offline */
