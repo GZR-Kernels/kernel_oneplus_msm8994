@@ -80,6 +80,9 @@
 		pr_err(LOG_TAG ": " a,##arg);\
 	}while(0)
 
+//Needed by: input: synaptics: s1302: Make s1302_is_keypad_stopped() safe
+bool no_buttons_during_touch = 1;
+
 /*---------------------------------------------Global Variable----------------------------------------------*/
  static unsigned int tp_debug = 0;
 static int force_update = 0;
@@ -1517,7 +1520,10 @@ bool s1302_is_keypad_stopped(void)
 {
 	struct synaptics_ts_data *ts = tc_g;
 
-	return ts->stop_keypad;
+	if (no_buttons_during_touch)
+		return ts ? ts->stop_keypad : false;
+
+	return false;
 }
 
 static void synaptics_input_event(struct input_handle *handle,
