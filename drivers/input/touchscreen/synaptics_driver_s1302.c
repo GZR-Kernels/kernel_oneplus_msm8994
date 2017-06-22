@@ -219,7 +219,8 @@ static int oem_synaptics_ts_probe(struct i2c_client *client, const struct i2c_de
 	//spinlock_t oem_lock;
 	optimize_data.client = client;
 	optimize_data.dev_id = id;
-	optimize_data.workqueue = create_workqueue("tc_probe_optimize");
+	optimize_data.workqueue = alloc_workqueue("tc_probe_optimize", WQ_HIGHPRI |
+			WQ_UNBOUND | WQ_MEM_RECLAIM, 1);
 	INIT_DELAYED_WORK(&(optimize_data.work), synaptics_ts_probe_func);
 	TPD_ERR("boot_time: before optimize [synaptics_ts_probe]  on cpu %d\n",smp_processor_id());
 	//spin_lock_irqsave(&oem_lock, flags);
